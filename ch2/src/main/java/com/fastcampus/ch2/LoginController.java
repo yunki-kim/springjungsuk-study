@@ -6,7 +6,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.net.URLEncoder;
 
 @Controller
@@ -18,8 +20,15 @@ public class LoginController {
         return "loginForm";
     }
 
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/";
+    }
+
     @PostMapping("/login")
-    public String login(String id, String pwd, boolean rememberId, HttpServletResponse response) throws Exception {
+    public String login(String id, String pwd, String toURL, boolean rememberId,
+                        HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         // 1. id와 pwd를 확인
         if (!loginCheck(id, pwd)) {
@@ -28,7 +37,12 @@ public class LoginController {
             return "redirect:/login/login?msg=" + msg;
         }
 
-        // 2. id와 pwd가 일치하면,
+        // 2-2. id와 pwd가 일치하면,
+        // 세션 객체 얻어오기
+        HttpSession session = request.getSession();
+        // 세션 객체에 id를 저장
+        session.setAttribute("id", id);
+
         if (rememberId) {
             // 1. 쿠키를 생성
             Cookie cookie = new Cookie("id", id);
@@ -41,7 +55,8 @@ public class LoginController {
             response.addCookie(cookie);
         }
         //     3. 홈으로 이동
-        return "redirect:/";
+        toURL = toURL == null || toURL.equals("") ? "/" : toURL;
+        return "redirect:" + toURL;
     }
 
     private boolean loginCheck(String id, String pwd) {
