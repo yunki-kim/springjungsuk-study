@@ -8,9 +8,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Date;
-import java.sql.PreparedStatement;
 
 import static org.junit.Assert.assertTrue;
 
@@ -127,5 +127,38 @@ public class DBConnectionTest2Test {
         assertTrue(rowCnt == 1);
 
         assertTrue(selectUser(user.getId()) == null);
+    }
+
+    @Test
+    public void transactionTest() throws Exception {
+        Connection conn = null;
+        try {
+            deleteAll();
+            conn = ds.getConnection();
+            conn.setAutoCommit(false); // default : conn.setAutoCommit(true);
+            String sql = "insert into user_info values (?, ?, ?, ?, ?, ?, now())";
+
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, "asdf");
+            pstmt.setString(2, "1234");
+            pstmt.setString(3, "abc");
+            pstmt.setString(4, "aaa@aaa.com");
+            pstmt.setDate(5, new java.sql.Date(new Date().getTime()));
+            pstmt.setString(6, "fb");
+
+            int rowCnt = pstmt.executeUpdate();
+
+            pstmt.setString(1, "asdf");
+            rowCnt = pstmt.executeUpdate();
+
+            conn.commit();
+
+        } catch (Exception e) {
+            conn.rollback();
+            e.printStackTrace();
+        } finally {
+
+        }
+
     }
 }
