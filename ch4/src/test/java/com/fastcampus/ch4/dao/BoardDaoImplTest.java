@@ -23,7 +23,7 @@ public class BoardDaoImplTest {
     public void insertTestData() throws Exception {
         boardDao.deleteAll();
         for (int i = 0; i < 220; i++) {
-            BoardDto boardDto = new BoardDto("title" + 1, "no content", "admin");
+            BoardDto boardDto = new BoardDto("title" + i, "no content", "asdf");
             boardDao.insert(boardDto);
         }
     }
