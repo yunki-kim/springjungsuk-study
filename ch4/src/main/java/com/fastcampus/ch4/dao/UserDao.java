@@ -1,12 +1,17 @@
 package com.fastcampus.ch4.dao;
 
-import com.fastcampus.ch4.domain.*;
+import com.fastcampus.ch4.domain.UserDto;
 
 public interface UserDao {
-    User selectUser(String id) throws Exception;
-    int deleteUser(String id) throws Exception;
-    int insertUser(User user) throws Exception;
-    int updateUser(User user) throws Exception;
-    int count() throws Exception;
-    void deleteAll() throws Exception;
+    public int insert(UserDto userDto) throws Exception;
+
+    public UserDto select(String id) throws Exception;
+
+    public int update(UserDto userDto) throws Exception;
+
+    public int delete(String id) throws Exception;
+
+    public int deleteAll();
+
+    public int count() throws Exception;
 }

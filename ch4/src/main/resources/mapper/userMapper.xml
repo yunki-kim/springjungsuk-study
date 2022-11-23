@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fastcampus.ch4.dao.UserMapper">
+    <insert id="insert" parameterType="UserDto">
+        INSERT INTO user_info
+        VALUES (#{id}, #{pwd}, #{name}, #{email}, #{sns})
+    </insert>
+
+    <select id="select" parameterType="String" resultType="UserDto">
+        SELECT id, pwd, name, email, reg_date, sns
+        FROM user_info
+        WHERE id = #{value}
+    </select>
+
+    <update id="update" parameterType="UserDto">
+        UPDATE user_info
+        SET pwd = #{pwd},
+            name = #{name},
+            email = #{email},
+            birth = #{birth},
+            sns = #{sns}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="String">
+        DELETE FROM user_info
+        WHERE id = #{value}
+    </delete>
+
+    <delete id="deleteAll">
+        DELETE FROM user_info
+    </delete>
+
+    <select id="count" resultType="int">
+        SELECT count(*) FROM board
+    </select>
+
+</mapper>
