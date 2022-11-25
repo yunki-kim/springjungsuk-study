@@ -1,6 +1,7 @@
 package com.fastcampus.ch4.dao;
 
 import com.fastcampus.ch4.domain.BoardDto;
+import com.fastcampus.ch4.domain.SearchCondition;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class BoardDaoImplTest {
     public void insertTestData() throws Exception {
         boardDao.deleteAll();
         for (int i = 0; i < 220; i++) {
-            BoardDto boardDto = new BoardDto("title" + i, "no content", "asdf");
+            BoardDto boardDto = new BoardDto("title" + (i + 1), "no content", "asdf");
             boardDao.insert(boardDto);
         }
     }
@@ -203,5 +204,39 @@ public class BoardDaoImplTest {
         boardDto = boardDao.select(bno);
         assertTrue(boardDto!=null);
         assertTrue(boardDto.getView_cnt() == 2);
+    }
+
+    @Test
+    public void searchSelectPageTest() throws Exception {
+        boardDao.deleteAll();
+        for (int i = 0; i <= 20; i++) {
+            BoardDto boardDto = new BoardDto("title" + i + 1, "no content", "asdf" + i + 1);
+            boardDao.insert(boardDto);
+        }
+
+        SearchCondition sc = new SearchCondition(1, 10, "title2", "T");
+        List<BoardDto> list = boardDao.searchSelectPage(sc);
+        assertTrue(list.size() == 2);
+
+        sc = new SearchCondition(1, 10, "asdf2", "W");
+        list = boardDao.searchSelectPage(sc);
+        assertTrue(list.size() == 2);
+    }
+
+    @Test
+    public void searchResultCntTest() throws Exception {
+        boardDao.deleteAll();
+        for (int i = 0; i <= 20; i++) {
+            BoardDto boardDto = new BoardDto("title" + i + 1, "no content", "asdf");
+            boardDao.insert(boardDto);
+        }
+
+        SearchCondition sc = new SearchCondition(1, 10, "title2", "T");
+        int cnt = boardDao.searchResultCnt(sc);
+        assertTrue(cnt == 2);
+
+        sc = new SearchCondition(1, 10, "asdf2", "W");
+        cnt = boardDao.searchResultCnt(sc);
+        assertTrue(cnt == 2);
     }
 }

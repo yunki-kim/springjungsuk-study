@@ -2,6 +2,7 @@ package com.fastcampus.ch4.controller;
 
 import com.fastcampus.ch4.domain.BoardDto;
 import com.fastcampus.ch4.domain.PageHandler;
+import com.fastcampus.ch4.domain.SearchCondition;
 import com.fastcampus.ch4.service.BoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,9 +14,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/board")
@@ -24,28 +26,25 @@ public class BoardController {
     @Autowired BoardService boardService;
 
     @GetMapping("/list")
-    public String list(Integer page, Integer pageSize, Model model, HttpServletRequest request) {
+    public String list(SearchCondition sc, Model model, HttpServletRequest request) {
         if(!loginCheck(request)) return "redirect:/login/login?toURL=" + request.getRequestURL();
-
-        if (page == null) page = 1;
-        if (pageSize == null) pageSize = 10;
-
         try {
-            int totalCnt = boardService.getCount();
-            PageHandler pageHandler = new PageHandler(totalCnt, page, pageSize);
-            Map map = new HashMap();
-            map.put("offset", (page - 1) * pageSize);
-            map.put("pageSize", pageSize);
+            int totalCnt = boardService.getSearchResultCnt(sc);
+            model.addAttribute("totalCnt", totalCnt);
 
-            List<BoardDto> list = boardService.getPage(map);
+            PageHandler pageHandler = new PageHandler(totalCnt, sc);
+
+            List<BoardDto> list = boardService.getSearchResultPage(sc);
             model.addAttribute("list", list);
             model.addAttribute("ph", pageHandler);
-            model.addAttribute("page", page);
-            model.addAttribute("pageSize", pageSize);
+
+            Instant startOfToday = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant();
+            model.addAttribute("startOfToday", startOfToday.toEpochMilli());
         } catch (Exception e) {
             e.printStackTrace();
+            model.addAttribute("msg", "LIST_FAIL");
+            model.addAttribute("totalCnt", 0);
         }
-
         return "boardList";
     }
 
