@@ -49,10 +49,8 @@ public class CommentServiceImpl implements CommentService {
     @Transactional(rollbackFor = Exception.class)
     public int remove(Integer cno, Integer bno, String commenter) throws Exception {
         int rowCnt = boardDao.updateCommentCnt(bno, -1);
-        System.out.println("updateCommentCnt - rowCnt = " + rowCnt);
         // throw new Exception("test");
         rowCnt = commentDao.delete(cno, commenter);
-        System.out.println("rowCnt = " + rowCnt);
         return rowCnt;
     }
 
